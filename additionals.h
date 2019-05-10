@@ -9,6 +9,12 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <fstream>
+#include <sstream>
+
+
+auto read_entire_file(std::string& in_filename);
+
 
 std::vector<std::string> parse_config_file(std::string config_filename);
 

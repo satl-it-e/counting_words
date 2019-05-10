@@ -5,9 +5,19 @@
 #include "additionals.h"
 
 
+auto read_entire_file(std::string& in_filename){
+    std::ifstream in_file(in_filename);
+    auto ss = std::ostringstream{};
+    ss << in_file.rdbuf();
+    in_file.close();
+    return ss.str();
+}
+
+
 std::vector<std::string> parse_config_file(std::string config_filename){
     std::vector<std::string> config;
-    //TODO
+    std::string config_file = read_entire_file(config_filename);
+    
     return config;
 }
 
@@ -20,10 +30,10 @@ std::string get_txt_file(const std::string* unknown){
 
 
 std::string read_file(const std::string* unknown_data_filename){
-    std::string words;
+    std::string words = read_entire_file(*unknown_data_filename);
 
-    std::string data_filename = get_txt_file(unknown_data_filename);
-    //TODO
+//    std::string data_filename = get_txt_file(unknown_data_filename);
+//    //TODO
 
     return words;
 }
