@@ -3,7 +3,28 @@ project(counting_words)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(ADDITIONAL_FILES additionals.cpp)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
 
-add_executable(counting_words_consistent ${ADDITIONAL_FILES} consistent_main.cpp)
-add_executable(counting_words_parallel ${ADDITIONAL_FILES} parallel_main.cpp)
+set(ICU_MAJOR_VER "57")
+set(ICU_FULL_VERSION "${ICU_MAJOR_VER}.1")
+
+
+
+find_package(Boost REQUIRED system)
+find_package(Boost COMPONENTS system filesystem locale REQUIRED)
+
+add_executable(counting_words main.cpp config.h additionals.cpp)
+
+target_link_libraries(counting_words
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_LOCALE_LIBRARY}
+        ${ICU_LIBRARIES}
+        )
+
+#install(FILES ${ICUIL18N_LIB} ${ICUUC_LIB} ${ICUDATA_LIB}
+#        ${ICUIL18N_MAJOR_LIB} ${ICUUC_MAJOR_LIB} ${ICUDATA_MAJOR_LIB}
+#        DESTINATION lib)
+
+
