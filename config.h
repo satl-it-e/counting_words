@@ -1,123 +1,39 @@
 #ifndef COUNTING_WORDS_CONFIG_H
 #define COUNTING_WORDS_CONFIG_H
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <map>
-#include <functional>
-#include <unordered_set>
-#include <set>
-#include <vector>
-#include <list>
+    #include <iostream>
+    #include <fstream>
+    #include <string>
+    #include <sstream>
+    #include <map>
+    #include <functional>
+    #include <unordered_set>
+    #include <vector>
+    #include <list>
 
-#include "additionals.h"
-
-
-class MyConfig{
-
-public:
-    std::string in_file;
-    std::string to_alph_file;
-    std::string to_numb_file;
-    int num_of_threads;
+    #include "additionals.h"
 
 
-private:
-    std::unordered_set<std::string> check_set = {"in_file", "to_alph_file", "to_numb_file", "num_of_threads"};
+    class MyConfig{
 
-public:
+        public:
+            std::string in_file;
+            std::string to_alph_file;
+            std::string to_numb_file;
+            int num_of_threads;
 
-    bool set_in_file(const std::list<std::string> &s_values) {
-        std::set<std::string> arch_ext = {".zip", ".targz", ".tar.gz", ".7z"};
-        std::string ext = get_file_ext(s_values.front());
+        private:
+            std::unordered_set<std::string> check_set = {"in_file", "to_alph_file", "to_numb_file", "num_of_threads"};
 
-        if (ext == ".txt" || arch_ext.find(ext) != arch_ext.end()){
-            in_file = s_values.front();
-            return true;
-        }
-        return false;
-    }
+        public:
+            bool set_in_file(const std::list<std::string> &s_values);
+            bool set_to_alph_file(const std::list<std::string> &s_values);
+            bool set_to_numb_file(const std::list<std::string> &s_values);
+            bool set_num_of_threads(const std::list<std::string> &s_values);
 
-
-    bool set_to_alph_file(const std::list<std::string> &s_values) {
-        if ( is_file_ext(s_values.front(), ".txt") ){
-            to_alph_file = s_values.front();
-            return true;
-        }
-        return false;
-    }
-
-
-    bool set_to_numb_file(const std::list<std::string> &s_values) {
-        if ( is_file_ext(s_values.front(), ".txt") ){
-            to_numb_file = s_values.front();
-            return true;
-        }
-        return false;
-    }
-
-    bool set_num_of_threads(const std::list<std::string> &s_values){
-        int ch = std::stoi(s_values.front());
-        if (0 < ch){
-            std::istringstream ss (s_values.front());
-            return ss >> num_of_threads ? true: false;
-        }
-        return false;
-    }
-
-
-    bool is_configured(){
-        return check_set.empty();
-    }
-
-    int load_configs_from_file(const std::string &f_name){
-
-        std::map< std::string, std::function<bool(const std::list<std::string>&)> > cnf;
-
-        cnf.emplace(std::make_pair("in_file", [this](const std::list<std::string> &s_values)-> bool {return set_in_file(s_values);}));
-        cnf.emplace(std::make_pair("to_alph_file", [this](const std::list<std::string> &s_values)-> bool {return set_to_alph_file(s_values);}));
-        cnf.emplace(std::make_pair("to_numb_file", [this](const std::list<std::string> &s_values)-> bool {return set_to_numb_file(s_values);}));
-        cnf.emplace(std::make_pair("num_of_threads", [this](const std::list<std::string> &s_values)-> bool {return set_num_of_threads(s_values);}));
-
-        try{
-
-            // read config file line by line
-            std::ifstream f(f_name);
-            if (f){
-                std::string line;
-                while (getline(f, line)){
-                    std::list<std::string> content;
-                    int c = 0;
-                    for(int i = 0; i < line.length(); i++) {
-                        if (isspace(line[i])){
-                            if (c!= i){
-                                content.emplace_back(line.substr(c, i-c));
-                            }
-                            c = i+1;
-                        }
-                    }
-                    if (c != line.length()){ content.emplace_back(line.substr(c, line.length()-c)); }
-
-                    // load values into attributes
-                    std::string cnf_name = content.front();
-                    content.pop_front();
-
-                    if ( cnf.find(cnf_name) != cnf.end()){
-                        if ( cnf[cnf_name](content) ){
-                            check_set.erase (cnf_name);
-                        } else { std::cout << "Error. Couldn't load" + cnf_name + "\n" << std::endl; return -3; }
-                    }
-                }
-                f.close();
-                return 0;
-
-            } else { std::cout << "File coulnd't be opened."; return -1; }
-        } catch(std::string &err){ std::cout << err << std::endl; return -2; }
-    }
-
-};
+            bool is_configured();
+            int load_configs_from_file(const std::string &f_name);
+    };
 
 
 #endif //COUNTING_WORDS_CONFIG_H

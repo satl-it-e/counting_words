@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 #find_package(Boost REQUIRED COMPONENTS system filesystem locale REQUIRED)
 
-add_executable(counting_words main.cpp config.h additionals.cpp)
+add_executable(counting_words main.cpp additionals.cpp config.cpp)
 
 #target_link_libraries(counting_words
 #        ${Boost_PROGRAM_OPTIONS_LIBRARY}
