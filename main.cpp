@@ -12,6 +12,7 @@
 #include "additionals.h"
 #include "config.h"
 #include "archive_extract.h"
+#include "time_measure.h"
 
 
 int main(int argc, char *argv[]){
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]){
         read_file = mc.in_file.c_str();
     }
 
-    // read
+    auto gen_st_time = get_current_time_fenced();         //~~~~~~~~~ read start
     std::ifstream in_f(read_file);
     if (! in_f.is_open() || in_f.rdstate())
         { std::cerr << "Couldn't open input-file."; return -2; }
@@ -53,6 +54,7 @@ int main(int argc, char *argv[]){
     ss << in_f.rdbuf();
     content = ss.str();
 
+    auto read_fn_time = get_current_time_fenced();        //~~~~~~~~~ read finish  | index start
 
     using namespace boost::locale::boundary;
 
@@ -70,6 +72,7 @@ int main(int argc, char *argv[]){
         cut_words[*it]++;
     }
 
+    auto index_fn_time = get_current_time_fenced();       //~~~~~~~~~ index finish
 
     using namespace std;
 
@@ -91,6 +94,12 @@ int main(int argc, char *argv[]){
         alp_out_f << v.first << ": " << std::to_string(v.second) << std::endl;
     }
 
+    auto gen_fn_time = get_current_time_fenced();         //~~~~~~~~~ general finish
+
+
+    std::cout << "General time (read-index-write): " << to_us(gen_fn_time - gen_st_time) << std::endl;
+    std::cout << "Reading time (after unzip): "      << to_us(read_fn_time - gen_st_time) << std::endl;
+    std::cout << "Indexing time (boost included): "  << to_us(index_fn_time - read_fn_time) << std::endl;
 
     std::cout << "\nOK\n" << std::endl;
     return 0;
