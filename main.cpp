@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
+#include <iomanip>
 
 #include <archive.h>
 #include <archive_entry.h>
@@ -85,23 +86,28 @@ int main(int argc, char *argv[]){
     std::sort(vector_words.begin(), vector_words.end(), [](const auto t1, const auto t2){ return t1.second < t2.second;});
     ofstream num_out_f(mc.to_numb_file);
     for (auto &v : vector_words) {
-        num_out_f << v.first << ": " << std::to_string(v.second) << std::endl;
+        num_out_f << std::left << std::setw(20) << v.first << ": ";
+        num_out_f << std::right << std::setw(10) << std::to_string(v.second) << std::endl;
     }
 
     std::sort(vector_words.begin(), vector_words.end(), [](const auto t1, const auto t2){ return t1.first.compare(t2.first)<0;});
     ofstream alp_out_f(mc.to_alph_file);
     for (auto &v : vector_words) {
-        alp_out_f << v.first << ": " << std::to_string(v.second) << std::endl;
+        alp_out_f << std::left << std::setw(20) << v.first <<  ": ";
+        alp_out_f << std::right << std::setw(10) << std::to_string(v.second) << std::endl;
     }
 
     auto gen_fn_time = get_current_time_fenced();         //~~~~~~~~~ general finish
 
 
-    std::cout << "General time (read-index-write): " << to_us(gen_fn_time - gen_st_time) << std::endl;
-    std::cout << "Reading time (after unzip): "      << to_us(read_fn_time - gen_st_time) << std::endl;
-    std::cout << "Indexing time (boost included): "  << to_us(index_fn_time - read_fn_time) << std::endl;
+    std::cout << std::left  << std::setw(35) <<  "General time (read-index-write): ";
+    std::cout << std::right  << std::setw(10) << to_us(gen_fn_time - gen_st_time) << std::endl;
+    std::cout << std::left  << std::setw(35) << "Reading time (after unzip): ";
+    std::cout << std::right << std::setw(10) << to_us(read_fn_time - gen_st_time)  << std::endl;
+    std::cout << std::left << std::setw(35) << "Indexing time (boost included): " ;
+    std::cout << std::right  << std::setw(10) << to_us(index_fn_time - read_fn_time)  << std::endl;
 
-    std::cout << "\nOK\n" << std::endl;
+    std::cout << "\nFinished.\n" << std::endl;
     return 0;
 
 }

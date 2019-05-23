@@ -15,9 +15,7 @@ find_package(Boost COMPONENTS system filesystem locale REQUIRED)
 find_package(LibArchive REQUIRED)
 
 add_executable(counting_words main.cpp config.cpp additionals.cpp archive_extract.cpp time_measure.h)
-add_executable(test_archive test_archive.cpp time_measure.h)
 
-target_link_libraries(test_archive ${LibArchive_LIBRARIES})
 target_link_libraries(counting_words ${LibArchive_LIBRARIES})
 target_link_libraries( counting_words
                       ${Boost_FILESYSTEM_LIBRARY}
