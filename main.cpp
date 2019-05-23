@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
-//#include <iomanip>
 
 #include <archive.h>
 #include <archive_entry.h>
@@ -12,6 +11,7 @@
 
 #include "additionals.h"
 #include "config.h"
+#include "archive_extract.h"
 
 
 int main(int argc, char *argv[]){
@@ -39,25 +39,13 @@ int main(int argc, char *argv[]){
 
     // opening archive
     if (is_file_ext(mc.in_file, ".zip")){
-        struct archive *a;
-        struct archive_entry *entry;
-        int r;
-
-        a = archive_read_new();
-        archive_read_support_filter_all(a);
-        archive_read_support_format_all(a);
-        r = archive_read_open_filename(a, mc.in_file.data(), 10240); // Note 1
-        if (r != ARCHIVE_OK){
-            std::cerr << "Archive " << mc.in_file << " couldn't be opened" << std::endl;
-            return -4;
-        }
-        if (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
-            read_file = archive_entry_pathname(entry);
-        }
+        read_file = extract(mc.in_file.c_str());
+    } else{
+        read_file = mc.in_file.c_str();
     }
 
     // read
-    std::ifstream in_f(mc.in_file);
+    std::ifstream in_f(read_file);
     if (! in_f.is_open() || in_f.rdstate())
         { std::cerr << "Couldn't open input-file."; return -2; }
 
@@ -69,10 +57,9 @@ int main(int argc, char *argv[]){
     using namespace boost::locale::boundary;
 
     std::locale loc = boost::locale::generator().generate("en_US.UTF-8");
-    std::string text = "To e e e e  that be oR nOt to Be, that is! th?e question.";
 
     // fold case
-    text = boost::locale::to_lower(content, loc);
+    content = boost::locale::to_lower(content, loc);
 
     // words to map
     std::unordered_map<std::string, int> cut_words;
@@ -95,13 +82,13 @@ int main(int argc, char *argv[]){
     std::sort(vector_words.begin(), vector_words.end(), [](const auto t1, const auto t2){ return t1.second < t2.second;});
     ofstream num_out_f(mc.to_numb_file);
     for (auto &v : vector_words) {
-        num_out_f << v.first << ": " << std::to_string(v.second) + "\t";
+        num_out_f << v.first << ": " << std::to_string(v.second) << std::endl;
     }
 
     std::sort(vector_words.begin(), vector_words.end(), [](const auto t1, const auto t2){ return t1.first.compare(t2.first)<0;});
     ofstream alp_out_f(mc.to_alph_file);
     for (auto &v : vector_words) {
-        alp_out_f << v.first << ": " << std::to_string(v.second) + "\t";
+        alp_out_f << v.first << ": " << std::to_string(v.second) << std::endl;
     }
 
 
