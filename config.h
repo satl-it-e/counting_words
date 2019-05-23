@@ -1,18 +1,19 @@
 #ifndef COUNTING_WORDS_CONFIG_H
 #define COUNTING_WORDS_CONFIG_H
 
-    #include <iostream>
-    #include <fstream>
-    #include <string>
-    #include <sstream>
-    #include <map>
-    #include <functional>
-    #include <unordered_set>
-    #include <vector>
-    #include <list>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <map>
+#include <functional>
+#include <unordered_set>
+#include <vector>
+#include <list>
+#include <set>
 
-    #include "additionals.h"
 
+#include "additionals.h"
 
     class MyConfig{
 

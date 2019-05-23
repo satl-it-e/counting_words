@@ -1,4 +1,6 @@
+
 #include "config.h"
+
 
 bool MyConfig::set_in_file(const std::list<std::string> &s_values) {
     std::set<std::string> arch_ext = {".zip", ".targz", ".tar.gz", ".7z"};

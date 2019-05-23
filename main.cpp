@@ -1,9 +1,14 @@
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
+//#include <iomanip>
+
+#include <archive.h>
+#include <archive_entry.h>
 
 #include <boost/locale.hpp>
-//#include <boost/locale/boundary/segment.hpp>
-//#include <boost/locale/boundary/index.hpp>
+#include <boost/locale/boundary/segment.hpp>
+#include <boost/locale/boundary/index.hpp>
 
 #include "additionals.h"
 #include "config.h"
@@ -18,7 +23,7 @@ int main(int argc, char *argv[]){
     } else { conf_file_name = "config.dat"; }
 
     if (! is_file_ext(conf_file_name, ".txt") && ! is_file_ext(conf_file_name, ".dat") ) {
-        std::cerr << "Wrong config file extention." << std::endl;
+        std::cerr << "Wrong config file extension." << std::endl;
         return -1;
     }
 
@@ -26,9 +31,30 @@ int main(int argc, char *argv[]){
     MyConfig mc;
     mc.load_configs_from_file(conf_file_name);
     if (mc.is_configured()) {
-        std::cout << "YES! Configurations loaded successfuly.\n" << std::endl;
+        std::cout << "YES! Configurations loaded successfully.\n" << std::endl;
     } else { std::cerr << "Error. Not all configurations were loaded properly."; return -3;}
 
+
+    std::string read_file;
+
+    // opening archive
+    if (is_file_ext(mc.in_file, ".zip")){
+        struct archive *a;
+        struct archive_entry *entry;
+        int r;
+
+        a = archive_read_new();
+        archive_read_support_filter_all(a);
+        archive_read_support_format_all(a);
+        r = archive_read_open_filename(a, mc.in_file.data(), 10240); // Note 1
+        if (r != ARCHIVE_OK){
+            std::cerr << "Archive " << mc.in_file << " couldn't be opened" << std::endl;
+            return -4;
+        }
+        if (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
+            read_file = archive_entry_pathname(entry);
+        }
+    }
 
     // read
     std::ifstream in_f(mc.in_file);
@@ -46,11 +72,11 @@ int main(int argc, char *argv[]){
     std::string text = "To e e e e  that be oR nOt to Be, that is! th?e question.";
 
     // fold case
-    text = boost::locale::to_lower(text, loc);
+    text = boost::locale::to_lower(content, loc);
 
     // words to map
     std::unordered_map<std::string, int> cut_words;
-    ssegment_index map(word, text.begin(), text.end(), loc);
+    ssegment_index map(word, content.begin(), content.end(), loc);
     map.rule(word_any);
 
     for (ssegment_index::iterator it = map.begin(), e = map.end(); it != e; ++it) {
