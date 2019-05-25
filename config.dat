@@ -1,4 +1,4 @@
-in_file         data.txt
+in_file         data.zip
 to_alph_file    to_1.txt
 to_numb_file    to_2.txt
 num_of_threads  4

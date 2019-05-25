@@ -12,7 +12,7 @@
 
 #include "additionals.h"
 #include "config.h"
-#include "archive_extract.h"
+#include "my_archive.h"
 #include "time_measure.h"
 
 
@@ -37,23 +37,32 @@ int main(int argc, char *argv[]){
     } else { std::cerr << "Error. Not all configurations were loaded properly."; return -3;}
 
 
-    std::string read_file;
-
-    // opening archive
-    if (is_file_ext(mc.in_file, ".zip")){
-        read_file = extract(mc.in_file.c_str());
-    } else{
-        read_file = mc.in_file.c_str();
-    }
+    std::string content;
 
     auto gen_st_time = get_current_time_fenced();         //~~~~~~~~~ read start
-    std::ifstream in_f(read_file);
-    if (! in_f.is_open() || in_f.rdstate())
-        { std::cerr << "Couldn't open input-file."; return -2; }
+    // opening archive
+    if (is_file_ext(mc.in_file, ".zip")){
+        MyArchive arc;
+        if (arc.init(mc.in_file) != 0){
+            return -4;
+        }
+        if (arc.next_content_available()){
+            content = arc.get_next_content();
+        } else{
+            std::cerr << "No content available inside the archive" << std::endl;
+            return -5;
+        }
+        
+    } else{
+        std::ifstream in_f(mc.in_file);
+        if (! in_f.is_open() || in_f.rdstate())
+            { std::cerr << "Couldn't open input-file."; return -2; }
+        std::stringstream ss;
+        ss << in_f.rdbuf();
+        content = ss.str();
+    }
 
-    std::string content; std::stringstream ss;
-    ss << in_f.rdbuf();
-    content = ss.str();
+
 
     auto read_fn_time = get_current_time_fenced();        //~~~~~~~~~ read finish  | index start
 
@@ -102,7 +111,7 @@ int main(int argc, char *argv[]){
 
     std::cout << std::left  << std::setw(35) <<  "General time (read-index-write): ";
     std::cout << std::right  << std::setw(10) << to_us(gen_fn_time - gen_st_time) << std::endl;
-    std::cout << std::left  << std::setw(35) << "Reading time (after unzip): ";
+    std::cout << std::left  << std::setw(35) << "Reading time: ";
     std::cout << std::right << std::setw(10) << to_us(read_fn_time - gen_st_time)  << std::endl;
     std::cout << std::left << std::setw(35) << "Indexing time (boost included): " ;
     std::cout << std::right  << std::setw(10) << to_us(index_fn_time - read_fn_time)  << std::endl;

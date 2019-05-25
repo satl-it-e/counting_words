@@ -12,3 +12,7 @@ std::string get_file_ext(const std::string &file_name){
 int is_file_ext(const std::string &file_name, const std::string &ext){
     return !file_name.compare(file_name.length()-ext.length(), ext.length(), ext);
 }
+
+bool is_directory(const std::string& object){
+    return object.back() == '/';
+}
